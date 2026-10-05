@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
@@ -12,14 +9,21 @@ class DatabaseHelper {
   static Database? _database;
   Future<Database> get database async => _database ??= await _initDatabase();
 
-  static const int _version = 1;
+
+  static const int _version = 2;
   static const String _dbName = 'livros_db.db';
 
   Future<Database> _initDatabase() async {
-    Directory documentsDir = await getApplicationCacheDirectory();
-    String path = join(documentsDir.path, _dbName);
-    return openDatabase(path, onCreate: _createDb, version: _version);
+    String documentsDir = await getDatabasesPath();
+    String path = join(documentsDir, _dbName);
+    return openDatabase(
+      path,
+      version: _version,
+      onCreate: _createDb,
+      onUpgrade: _onUpgrade, 
+    );
   }
+
 
   Future _createDb(Database db, int version) async {
     await db.execute('''
@@ -31,5 +35,26 @@ class DatabaseHelper {
         foi_lido INTEGER NOT NULL
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL,
+        senha TEXT NOT NULL
+      )
+    ''');
+  }
+
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE usuarios (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          email TEXT NOT NULL,
+          senha TEXT NOT NULL
+        )
+      ''');
+    }
   }
 }
