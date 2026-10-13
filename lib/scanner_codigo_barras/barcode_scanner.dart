@@ -1,3 +1,4 @@
+import 'package:bibliotecapp_mobile/models/autor.dart';
 import 'package:bibliotecapp_mobile/scanner_codigo_barras/book_repository.dart';
 import 'package:bibliotecapp_mobile/views/add_livro.dart';
 import 'package:flutter/material.dart';
