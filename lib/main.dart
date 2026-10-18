@@ -1,3 +1,4 @@
+import 'package:bibliotecapp_mobile/views/login.dart';
 import 'package:flutter/material.dart';
 import 'package:bibliotecapp_mobile/views/home_page.dart';
 
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: const HomePage(),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
     );
   }

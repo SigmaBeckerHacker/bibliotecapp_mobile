@@ -3,6 +3,7 @@ import 'package:bibliotecapp_mobile/database/livro_dao.dart';
 import 'package:bibliotecapp_mobile/views/add_livro.dart';
 import 'package:bibliotecapp_mobile/views/livro_item.dart';
 import 'package:bibliotecapp_mobile/models/livro.dart';
+import 'package:bibliotecapp_mobile/views/login.dart'; 
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +25,24 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Bibliotecapp", style: TextStyle(fontWeight: FontWeight.w900),),
+        title: const Text(
+          "Bibliotecapp",
+          style: TextStyle(fontWeight: FontWeight.w900),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+            onPressed: () {
+            
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,18 +50,18 @@ class _HomePageState extends State<HomePage> {
           Center(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Bem Vindo!",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),),
+              child: Text(
+                "Bem Vindo!",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
             ),
           ),
-          Row(
-            children: [
-              
-            ],
+          const Row(
+            children: [],
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -62,10 +80,16 @@ class _HomePageState extends State<HomePage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return snapshot.data!.isEmpty
-                      ? Center(child: Text("Nenhum Livro cadastrado", style: TextStyle(color: colorScheme.onSurface)))
+                      ? Center(
+                          child: Text(
+                            "Nenhum Livro cadastrado",
+                            style: TextStyle(color: colorScheme.onSurface),
+                          ),
+                        )
                       : GridView.builder(
                           padding: const EdgeInsets.all(12.0),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 12.0,
                             mainAxisSpacing: 12.0,
@@ -81,7 +105,12 @@ class _HomePageState extends State<HomePage> {
                           },
                         );
                 } else if (snapshot.hasError) {
-                  return Center(child: Text(snapshot.error.toString(), style: TextStyle(color: colorScheme.onSurface)));
+                  return Center(
+                    child: Text(
+                      snapshot.error.toString(),
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  );
                 } else {
                   return const Center(child: CircularProgressIndicator());
                 }

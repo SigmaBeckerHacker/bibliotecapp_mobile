@@ -69,7 +69,7 @@ class _AddLivroState extends State<AddLivro> {
       // Preenche os campos de texto com os dados retornados
       setState(() {
         _tituloController.text = livroInfo.titulo;
-        _autorController.text = livroInfo.nomeAutor;
+        _autorController.text = livroInfo.autor;
         _generoController.text = livroInfo.genero;
       });
 
