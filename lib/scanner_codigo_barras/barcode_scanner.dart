@@ -1,13 +1,11 @@
-import 'package:bibliotecapp_mobile/models/autor.dart';
 import 'package:bibliotecapp_mobile/scanner_codigo_barras/book_repository.dart';
 import 'package:bibliotecapp_mobile/views/add_livro.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
-  final List<Autor> autoresCadastrados;
 
-  const BarcodeScannerScreen({super.key, required this.autoresCadastrados});
+  const BarcodeScannerScreen({super.key});
 
   @override
   State<BarcodeScannerScreen> createState() => _BarcodeScannerScreenState();

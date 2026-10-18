@@ -1,5 +1,7 @@
+import 'package:bibliotecapp_mobile/database/autor_dao.dart';
 import 'package:flutter/material.dart';
 import 'package:bibliotecapp_mobile/database/livro_dao.dart';
+import 'package:bibliotecapp_mobile/models/autor.dart';
 import 'package:bibliotecapp_mobile/models/livro.dart';
 import 'package:bibliotecapp_mobile/scanner_codigo_barras/barcode_scanner.dart';
 import 'package:bibliotecapp_mobile/scanner_codigo_barras/book_repository.dart';
@@ -15,27 +17,60 @@ class AddLivro extends StatefulWidget {
 class _AddLivroState extends State<AddLivro> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _tituloController = TextEditingController();
-  final TextEditingController _autorController = TextEditingController();
   final TextEditingController _generoController = TextEditingController();
-  
+
+  // Autor padrão de fallback para autores não identificados/cadastrados
+  final Autor _autorNaoIdentificado = Autor(id: 0, nome: 'Autor não identificado');
+
+  List<Autor> _listaAutores = [];
+  Autor? _autorSelecionado;
+
   bool _foiLido = false;
   bool _isCarregandoBook = false; // Controla o estado de loading ao buscar API
+  bool _isCarregandoAutores = true; // Controla o carregamento inicial do banco
 
   @override
   void initState() {
     super.initState();
-    if(widget.livro != null) {
-      _tituloController.text = widget.livro!.titulo;
-      _autorController.text = widget.livro!.autor;
-      _generoController.text = widget.livro!.genero;
-      _foiLido = widget.livro!.foi_lido; 
-    }
+    _carregarAutores();
+  }
+
+  /// Carrega autores do banco de dados e inicializa os campos
+  Future<void> _carregarAutores() async {
+    final autoresDoBanco = await AutorDao.instance.getAutores();
+
+    if (!mounted) return;
+
+    setState(() {
+      // Monta a lista com a opção "Autor não identificado" no início
+      _listaAutores = [_autorNaoIdentificado, ...autoresDoBanco];
+
+      if (widget.livro != null) {
+        _tituloController.text = widget.livro!.titulo;
+        _generoController.text = widget.livro!.genero;
+        _foiLido = widget.livro!.foi_lido;
+
+        // Associa o autor do livro em edição na lista de cadastrados
+        _autorSelecionado = _encontrarOuFallback(widget.livro!.autor);
+      } else {
+        _autorSelecionado = _autorNaoIdentificado;
+      }
+
+      _isCarregandoAutores = false;
+    });
+  }
+
+  /// Auxiliar para tentar encontrar um autor pelo nome ou retornar "Autor não identificado"
+  Autor _encontrarOuFallback(String nomeAutor) {
+    return _listaAutores.firstWhere(
+      (a) => a.nome.toLowerCase().trim() == nomeAutor.toLowerCase().trim(),
+      orElse: () => _autorNaoIdentificado,
+    );
   }
 
   @override
   void dispose() {
     _tituloController.dispose();
-    _autorController.dispose();
     _generoController.dispose();
     super.dispose();
   }
@@ -66,11 +101,11 @@ class _AddLivroState extends State<AddLivro> {
     });
 
     if (livroInfo != null) {
-      // Preenche os campos de texto com os dados retornados
+      // Preenche os campos e verifica o autor retornado na lista do Dropdown
       setState(() {
         _tituloController.text = livroInfo.titulo;
-        _autorController.text = livroInfo.autor;
         _generoController.text = livroInfo.genero;
+        _autorSelecionado = _encontrarOuFallback(livroInfo.autor);
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -87,116 +122,148 @@ class _AddLivroState extends State<AddLivro> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: widget.livro == null ? const Text("Adicionar Livro") : const Text("Alterando o Livro"),
+        title: widget.livro == null
+            ? const Text("Adicionar Livro")
+            : const Text("Alterando o Livro"),
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  // Botão para ler o código de barras
-                  ElevatedButton.icon(
-                    onPressed: _isCarregandoBook ? null : _escanearEPreencher,
-                    icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text("Escanear Código de Barras (ISBN)"),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+      body: _isCarregandoAutores
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
+                    child: ListView(
+                      children: [
+                        // Botão para ler o código de barras
+                        ElevatedButton.icon(
+                          onPressed: _isCarregandoBook ? null : _escanearEPreencher,
+                          icon: const Icon(Icons.qr_code_scanner),
+                          label: const Text("Escanear Código de Barras (ISBN)"),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+
+                        TextFormField(
+                          controller: _tituloController,
+                          decoration: const InputDecoration(
+                            labelText: "Título do Livro",
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) =>
+                              value == null || value.isEmpty ? 'Informe o título' : null,
+                        ),
+                        const SizedBox(height: 10),
+
+                        // DropdownButtonFormField de Autor
+                        DropdownButtonFormField<Autor>(
+                          value: _autorSelecionado,
+                          decoration: const InputDecoration(
+                            labelText: "Autor",
+                            border: OutlineInputBorder(),
+                          ),
+                          items: _listaAutores.map((autor) {
+                            return DropdownMenuItem<Autor>(
+                              value: autor,
+                              child: Text(autor.nome),
+                            );
+                          }).toList(),
+                          onChanged: (Autor? novoAutor) {
+                            if (novoAutor != null) {
+                              setState(() {
+                                _autorSelecionado = novoAutor;
+                              });
+                            }
+                          },
+                          validator: (value) =>
+                              value == null ? 'Selecione um autor' : null,
+                        ),
+                        const SizedBox(height: 10),
+
+                        TextFormField(
+                          controller: _generoController,
+                          decoration: const InputDecoration(
+                            labelText: "Gênero (ex: Ficção, Fantasia)",
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) =>
+                              value == null || value.isEmpty ? 'Informe o gênero' : null,
+                        ),
+                        const SizedBox(height: 10),
+
+                        DropdownButtonFormField<bool>(
+                          value: _foiLido,
+                          decoration: const InputDecoration(
+                            labelText: "Status de Leitura",
+                            border: OutlineInputBorder(),
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: true, child: Text("Sim (Lido)")),
+                            DropdownMenuItem(value: false, child: Text("Não (Quero Ler)")),
+                          ],
+                          onChanged: (bool? novoValor) {
+                            if (novoValor != null) {
+                              setState(() {
+                                _foiLido = novoValor;
+                              });
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 20),
+
+                        ElevatedButton(
+                          onPressed: _isCarregandoBook
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    final String autorNome =
+                                        _autorSelecionado?.nome ?? 'Autor não identificado';
+
+                                    if (widget.livro == null) {
+                                      Livro novoLivro = Livro(
+                                        titulo: _tituloController.text,
+                                        autor: autorNome,
+                                        genero: _generoController.text,
+                                        foi_lido: _foiLido,
+                                      );
+                                      int id = await LivroDao.instance.add(novoLivro);
+                                      novoLivro.id = id;
+                                    } else {
+                                      widget.livro!.titulo = _tituloController.text;
+                                      widget.livro!.autor = autorNome;
+                                      widget.livro!.genero = _generoController.text;
+                                      widget.livro!.foi_lido = _foiLido;
+                                      await LivroDao.instance.update(widget.livro!);
+                                    }
+
+                                    if (!context.mounted) return;
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Salvando livro...")),
+                                    );
+                                    Navigator.pop(context);
+                                  }
+                                },
+                          child: const Text("Salvar"),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 15),
+                ),
 
-                  TextFormField(
-                    controller: _tituloController,
-                    decoration: const InputDecoration(labelText: "Título do Livro", border: OutlineInputBorder()),
-                    validator: (value) => value == null || value.isEmpty ? 'Informe o título' : null,
-                  ),
-                  const SizedBox(height: 10),
-                  
-                  TextFormField(
-                    controller: _autorController,
-                    decoration: const InputDecoration(labelText: "Autor", border: OutlineInputBorder()),
-                    validator: (value) => value == null || value.isEmpty ? 'Informe o autor' : null,
-                  ),
-                  const SizedBox(height: 10),
-
-                  TextFormField(
-                    controller: _generoController,
-                    decoration: const InputDecoration(labelText: "Gênero (ex: Ficção, Fantasia)", border: OutlineInputBorder()),
-                    validator: (value) => value == null || value.isEmpty ? 'Informe o gênero' : null,
-                  ),
-                  const SizedBox(height: 10),
-
-                  DropdownButtonFormField<bool>(
-                    value: _foiLido,
-                    decoration: const InputDecoration(
-                      labelText: "Status de Leitura", 
-                      border: OutlineInputBorder(),
+                // Overlay de carregamento enquanto busca dados da API
+                if (_isCarregandoBook)
+                  Container(
+                    color: Colors.black26,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
                     ),
-                    items: const [
-                      DropdownMenuItem(value: true, child: Text("Sim (Lido)")),
-                      DropdownMenuItem(value: false, child: Text("Não (Quero Ler)")),
-                    ],
-                    onChanged: (bool? novoValor) {
-                      if (novoValor != null) {
-                        setState(() {
-                          _foiLido = novoValor;
-                        });
-                      }
-                    },
                   ),
-                  const SizedBox(height: 20),
-                  
-                  ElevatedButton(
-                    onPressed: _isCarregandoBook ? null : () async {
-                      if (_formKey.currentState!.validate()) {
-                        
-                        if (widget.livro == null) {
-                          Livro novoLivro = Livro(
-                            titulo: _tituloController.text,
-                            autor: _autorController.text,
-                            genero: _generoController.text,
-                            foi_lido: _foiLido,
-                          ); 
-                          int id = await LivroDao.instance.add(novoLivro);
-                          novoLivro.id = id;
-                        } else {
-                          widget.livro!.titulo = _tituloController.text;
-                          widget.livro!.autor = _autorController.text;
-                          widget.livro!.genero = _generoController.text;
-                          widget.livro!.foi_lido = _foiLido;
-                          await LivroDao.instance.update(widget.livro!);
-                        }
-
-                        if (!context.mounted) {
-                          return; 
-                        }
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Salvando livro..."))
-                        );
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: const Text("Salvar"),
-                  ),
-                ],
-              ),
+              ],
             ),
-          ),
-          
-          // Overlay de carregamento enquanto busca dados da API
-          if (_isCarregandoBook)
-            Container(
-              color: Colors.black26,
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:bibliotecapp_mobile/views/login.dart';
 import 'package:flutter/material.dart';
-import 'package:bibliotecapp_mobile/views/home_page.dart';
 
 void main() {
   runApp(const MyApp());
