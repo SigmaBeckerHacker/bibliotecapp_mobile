@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bibliotecapp_mobile/models/user.dart';
 import 'package:bibliotecapp_mobile/database/database_helper.dart';
 import 'cadastro_user.dart';
-import 'package:bibliotecapp_mobile/views/home_page.dart'; 
+import 'package:bibliotecapp_mobile/views/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,10 +39,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
 
-       
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()), 
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -57,8 +56,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -68,17 +69,18 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.menu_book_rounded,
                     size: 80,
-                    color: Colors.blueAccent,
+                    color: colorScheme.primary,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Bem-vindo!',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -86,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                     'Acesse sua biblioteca de livros',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -95,9 +97,19 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'E-mail',
-                      prefixIcon: const Icon(Icons.email_outlined),
+                      labelStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+                      prefixIcon: Icon(Icons.email_outlined, color: colorScheme.primary),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.onSurface.withOpacity(0.3)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -115,20 +127,29 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: _senhaController,
                     obscureText: _ocultarSenha,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'Senha',
-                      prefixIcon: const Icon(Icons.lock_outlined),
+                      labelStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+                      prefixIcon: Icon(Icons.lock_outlined, color: colorScheme.primary),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _ocultarSenha
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                          _ocultarSenha ? Icons.visibility_off : Icons.visibility,
+                          color: colorScheme.primary,
                         ),
                         onPressed: () {
                           setState(() {
                             _ocultarSenha = !_ocultarSenha;
                           });
                         },
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.onSurface.withOpacity(0.3)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -149,7 +170,8 @@ class _LoginPageState extends State<LoginPage> {
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -160,7 +182,6 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -171,7 +192,10 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Não tem conta? '),
+                      Text(
+                        'Não tem conta? ',
+                        style: TextStyle(color: colorScheme.onSurface),
+                      ),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -181,10 +205,10 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           'Clique aqui',
                           style: TextStyle(
-                            color: Colors.blueAccent,
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                           ),
