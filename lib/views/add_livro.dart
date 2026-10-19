@@ -76,47 +76,51 @@ class _AddLivroState extends State<AddLivro> {
   }
 
   Future<void> _escanearEPreencher() async {
-    final String? isbnLido = await Navigator.push<String>(
-      context,
-      MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
-    );
+  // Abre o scanner e aguarda o retorno do código de barras
+  final dynamic resultado = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
+  );
 
-    if (isbnLido == null || isbnLido.isEmpty || !mounted) return;
+  // Se o usuário cancelou a câmera voltando manualmente (resultado nulo/vazio)
+  if (resultado == null || resultado.toString().isEmpty || !mounted) return;
 
+  final String isbnLido = resultado.toString();
+
+  setState(() {
+    _isCarregandoBook = true;
+  });
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('Buscando informações do livro...')),
+  );
+
+  // Consulta a API pública pelo ISBN
+  final livroInfo = await BookRepository.fetchByIsbn(isbnLido);
+
+  if (!mounted) return;
+
+  setState(() {
+    _isCarregandoBook = false;
+  });
+
+  if (livroInfo != null) {
+    // Preenche os campos da AddLivro para o usuário revisar e clicar em SALVAR
     setState(() {
-      _isCarregandoBook = true;
+      _tituloController.text = livroInfo.titulo;
+      _generoController.text = livroInfo.genero;
+      _autorSelecionado = _encontrarOuFallback(livroInfo.autor);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Buscando informações do livro...')),
+      const SnackBar(content: Text('Dados preenchidos! Clique em Salvar para registrar.')),
     );
-
-    // Consulta a API pública pelo ISBN
-    final livroInfo = await BookRepository.fetchByIsbn(isbnLido);
-
-    if (!mounted) return;
-
-    setState(() {
-      _isCarregandoBook = false;
-    });
-
-    if (livroInfo != null) {
-      // Preenche os campos e verifica o autor retornado na lista do Dropdown
-      setState(() {
-        _tituloController.text = livroInfo.titulo;
-        _generoController.text = livroInfo.genero;
-        _autorSelecionado = _encontrarOuFallback(livroInfo.autor);
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dados do livro preenchidos com sucesso!')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Livro não encontrado para este código de barras.')),
-      );
-    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Livro não encontrado para este código de barras.')),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,7 @@
-import 'package:bibliotecapp_mobile/scanner_codigo_barras/book_repository.dart';
-import 'package:bibliotecapp_mobile/views/add_livro.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
-
   const BarcodeScannerScreen({super.key});
 
   @override
@@ -15,43 +12,27 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   final MobileScannerController _controller = MobileScannerController(
     formats: [BarcodeFormat.ean13], // ISBNs utilizam o formato EAN-13
   );
-  bool _isLoading = false;
+  bool _isScanned = false; // Flag para garantir apenas uma leitura
 
-  void _onDetect(BarcodeCapture capture) async {
-    if (_isLoading) return;
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onDetect(BarcodeCapture capture) {
+    if (_isScanned) return;
 
     for (final barcode in capture.barcodes) {
-      if (barcode.rawValue != null) {
+      if (barcode.rawValue != null && barcode.rawValue!.isNotEmpty) {
         setState(() {
-          _isLoading = true;
+          _isScanned = true;
         });
 
-        _controller.stop(); // Pausa a câmera durante a busca
+        _controller.stop();
 
-        final isbn = barcode.rawValue!;
-        final livroInfo = await BookRepository.fetchByIsbn(isbn);
-
-        if (!mounted) return;
-
-        if (livroInfo != null) {
-          // Navega para a tela de cadastro preenchendo os campos
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddLivro(
-                livro: livroInfo,
-              ),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Livro não encontrado na base de dados.')),
-          );
-          _controller.start();
-          setState(() {
-            _isLoading = false;
-          });
-        }
+        // Retorna APENAS o código ISBN lido para a tela anterior (AddLivro)
+        Navigator.pop(context, barcode.rawValue);
         break;
       }
     }
@@ -60,21 +41,22 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Escanear ISBN do Livro')),
-      body: Stack(
-        children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
+      appBar: AppBar(
+        title: const Text('Escanear ISBN do Livro'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flash_on),
+            onPressed: () => _controller.toggleTorch(),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black54,
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
+          IconButton(
+            icon: const Icon(Icons.cameraswitch),
+            onPressed: () => _controller.switchCamera(),
+          ),
         ],
+      ),
+      body: MobileScanner(
+        controller: _controller,
+        onDetect: _onDetect,
       ),
     );
   }

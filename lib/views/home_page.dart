@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:bibliotecapp_mobile/database/livro_dao.dart';
 import 'package:bibliotecapp_mobile/views/add_livro.dart';
+import 'package:bibliotecapp_mobile/views/autores_page.dart';
 import 'package:bibliotecapp_mobile/views/livro_item.dart';
 import 'package:bibliotecapp_mobile/models/livro.dart';
-import 'package:bibliotecapp_mobile/views/login.dart'; 
+import 'package:bibliotecapp_mobile/views/login.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -34,7 +35,6 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',
             onPressed: () {
-            
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -60,22 +60,45 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          const Row(
-            children: [],
-          ),
+          
+          // Row contendo "Seus livros:" e o botão "Autores" em Âmbar ao lado
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            child: Text(
-              "Seus livros:",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Seus livros:",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AutoresPage()),
+                    );
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.person, color: Colors.amber, size: 20),
+                  label: const Text(
+                    "Autores",
+                    style: TextStyle(
+                      color: Colors.amber,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+
           Expanded(
-            child: FutureBuilder(
+            child: FutureBuilder<List<Livro>>(
               future: LivroDao.instance.getLivros(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {

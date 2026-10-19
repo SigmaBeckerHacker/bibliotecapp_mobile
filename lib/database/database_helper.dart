@@ -9,8 +9,8 @@ class DatabaseHelper {
   static Database? _database;
   Future<Database> get database async => _database ??= await _initDatabase();
 
-
-  static const int _version = 2;
+  // 1. Mude a versão para 4
+  static const int _version = 4; 
   static const String _dbName = 'livros_db.db';
 
   Future<Database> _initDatabase() async {
@@ -24,7 +24,6 @@ class DatabaseHelper {
     );
   }
 
-
   Future _createDb(Database db, int version) async {
     await db.execute('''
       CREATE TABLE livros (
@@ -37,6 +36,13 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
+      CREATE TABLE autores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
       CREATE TABLE usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT NOT NULL,
@@ -45,11 +51,18 @@ class DatabaseHelper {
     ''');
   }
 
-
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
+    // Verifica se a tabela 'autores' precisa ser criada (para versões anteriores a 4)
+    if (oldVersion < 4) {
       await db.execute('''
-        CREATE TABLE usuarios (
+        CREATE TABLE IF NOT EXISTS autores (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nome TEXT NOT NULL
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           email TEXT NOT NULL,
           senha TEXT NOT NULL
