@@ -10,9 +10,10 @@ class BarcodeScannerScreen extends StatefulWidget {
 
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   final MobileScannerController _controller = MobileScannerController(
-    formats: [BarcodeFormat.ean13],
+    formats: [BarcodeFormat.ean13], // ISBNs utilizam o padrão EAN-13
   );
-  bool _isScanned = false;
+
+  bool _isScanned = false; // Garante que a leitura só seja disparada uma vez
 
   @override
   void dispose() {
@@ -25,14 +26,21 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
 
     for (final barcode in capture.barcodes) {
       if (barcode.rawValue != null && barcode.rawValue!.isNotEmpty) {
-        setState(() {
-          _isScanned = true;
-        });
+        // Limpa o código lido deixando apenas números/caracteres válidos do ISBN
+        final String isbnLimpo =
+            barcode.rawValue!.replaceAll(RegExp(r'[^0-9X]'), '');
 
-        _controller.stop();
+        if (isbnLimpo.isNotEmpty) {
+          setState(() {
+            _isScanned = true;
+          });
 
-        Navigator.pop(context, barcode.rawValue);
-        break;
+          _controller.stop();
+
+          // Retorna apenas a String do ISBN limpo para a AddLivro
+          Navigator.pop(context, isbnLimpo);
+          break;
+        }
       }
     }
   }
@@ -45,10 +53,12 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
+            tooltip: 'Alternar Lanterna',
             onPressed: () => _controller.toggleTorch(),
           ),
           IconButton(
             icon: const Icon(Icons.cameraswitch),
+            tooltip: 'Alternar Câmera',
             onPressed: () => _controller.switchCamera(),
           ),
         ],
