@@ -19,15 +19,14 @@ class _AddLivroState extends State<AddLivro> {
   final TextEditingController _tituloController = TextEditingController();
   final TextEditingController _generoController = TextEditingController();
 
-  // Autor padrão de fallback para autores não identificados/cadastrados
   final Autor _autorNaoIdentificado = Autor(id: 0, nome: 'Autor não identificado');
 
   List<Autor> _listaAutores = [];
   Autor? _autorSelecionado;
 
   bool _foiLido = false;
-  bool _isCarregandoBook = false; // Controla o estado de loading ao buscar API
-  bool _isCarregandoAutores = true; // Controla o carregamento inicial do banco
+  bool _isCarregandoBook = false;
+  bool _isCarregandoAutores = true;
 
   @override
   void initState() {
@@ -35,14 +34,12 @@ class _AddLivroState extends State<AddLivro> {
     _carregarAutores();
   }
 
-  /// Carrega autores do banco de dados e inicializa os campos
   Future<void> _carregarAutores() async {
     final autoresDoBanco = await AutorDao.instance.getAutores();
 
     if (!mounted) return;
 
     setState(() {
-      // Monta a lista com a opção "Autor não identificado" no início
       _listaAutores = [_autorNaoIdentificado, ...autoresDoBanco];
 
       if (widget.livro != null) {
@@ -50,7 +47,6 @@ class _AddLivroState extends State<AddLivro> {
         _generoController.text = widget.livro!.genero;
         _foiLido = widget.livro!.foi_lido;
 
-        // Associa o autor do livro em edição na lista de cadastrados
         _autorSelecionado = _encontrarOuFallback(widget.livro!.autor);
       } else {
         _autorSelecionado = _autorNaoIdentificado;
@@ -60,7 +56,6 @@ class _AddLivroState extends State<AddLivro> {
     });
   }
 
-  /// Auxiliar para tentar encontrar um autor pelo nome ou retornar "Autor não identificado"
   Autor _encontrarOuFallback(String nomeAutor) {
     return _listaAutores.firstWhere(
       (a) => a.nome.toLowerCase().trim() == nomeAutor.toLowerCase().trim(),
@@ -76,13 +71,11 @@ class _AddLivroState extends State<AddLivro> {
   }
 
   Future<void> _escanearEPreencher() async {
-  // Abre o scanner e aguarda o retorno do código de barras
   final dynamic resultado = await Navigator.push(
     context,
     MaterialPageRoute(builder: (context) => const BarcodeScannerScreen()),
   );
 
-  // Se o usuário cancelou a câmera voltando manualmente (resultado nulo/vazio)
   if (resultado == null || resultado.toString().isEmpty || !mounted) return;
 
   final String isbnLido = resultado.toString();
@@ -95,7 +88,6 @@ class _AddLivroState extends State<AddLivro> {
     const SnackBar(content: Text('Buscando informações do livro...')),
   );
 
-  // Consulta a API pública pelo ISBN
   final livroInfo = await BookRepository.fetchByIsbn(isbnLido);
 
   if (!mounted) return;
@@ -105,7 +97,6 @@ class _AddLivroState extends State<AddLivro> {
   });
 
   if (livroInfo != null) {
-    // Preenche os campos da AddLivro para o usuário revisar e clicar em SALVAR
     setState(() {
       _tituloController.text = livroInfo.titulo;
       _generoController.text = livroInfo.genero;
@@ -139,8 +130,7 @@ class _AddLivroState extends State<AddLivro> {
                   child: Form(
                     key: _formKey,
                     child: ListView(
-                      children: [
-                        // Botão para ler o código de barras
+                      children: [                    
                         ElevatedButton.icon(
                           onPressed: _isCarregandoBook ? null : _escanearEPreencher,
                           icon: const Icon(Icons.qr_code_scanner),
@@ -161,8 +151,7 @@ class _AddLivroState extends State<AddLivro> {
                               value == null || value.isEmpty ? 'Informe o título' : null,
                         ),
                         const SizedBox(height: 10),
-
-                        // DropdownButtonFormField de Autor
+                    
                         DropdownButtonFormField<Autor>(
                           value: _autorSelecionado,
                           decoration: const InputDecoration(
@@ -257,8 +246,7 @@ class _AddLivroState extends State<AddLivro> {
                     ),
                   ),
                 ),
-
-                // Overlay de carregamento enquanto busca dados da API
+ 
                 if (_isCarregandoBook)
                   Container(
                     color: Colors.black26,

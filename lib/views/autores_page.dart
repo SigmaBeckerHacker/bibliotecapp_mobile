@@ -48,6 +48,8 @@ class _AutoresPageState extends State<AutoresPage> {
                 return AutorItem(
                   autor: currentAutor,
                   deleteItem: () => deleteAutor(currentAutor),
+                  onAutorUpdated: () =>
+                      setState(() {}),
                 );
               },
             );

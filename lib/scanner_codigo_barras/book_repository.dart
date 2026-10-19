@@ -8,16 +8,13 @@ class BookRepository {
     final cleanIsbn = isbn.replaceAll(RegExp(r'[^\d]'), '');
     if (cleanIsbn.isEmpty) return null;
 
-    // 1. Tenta buscar no Open Library
     Livro? info = await _fetchFromOpenLibrary(cleanIsbn);
     
-    // 2. Fallback: Tenta no Google Books se o Open Library não encontrar
     info ??= await _fetchFromGoogleBooks(cleanIsbn);
 
     return info;
   }
 
-  /// Busca no Open Library API
   static Future<Livro?> _fetchFromOpenLibrary(String isbn) async {
     final url = Uri.parse(
       'https://openlibrary.org/api/books?bibkeys=ISBN:$isbn&format=json&jscmd=data',
@@ -59,7 +56,6 @@ class BookRepository {
     return null;
   }
 
-  /// Busca no Google Books API (Fallback)
   static Future<Livro?> _fetchFromGoogleBooks(String isbn) async {
     final url = Uri.parse(
       'https://www.googleapis.com/books/v1/volumes?q=isbn:$isbn',

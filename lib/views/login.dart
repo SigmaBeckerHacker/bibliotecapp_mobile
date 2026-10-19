@@ -93,7 +93,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Campo E-mail
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -123,7 +122,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Campo Senha
                   TextFormField(
                     controller: _senhaController,
                     obscureText: _ocultarSenha,
@@ -164,7 +162,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Botão Entrar
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -188,7 +185,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Link para Cadastro
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

@@ -10,9 +10,9 @@ class BarcodeScannerScreen extends StatefulWidget {
 
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   final MobileScannerController _controller = MobileScannerController(
-    formats: [BarcodeFormat.ean13], // ISBNs utilizam o formato EAN-13
+    formats: [BarcodeFormat.ean13],
   );
-  bool _isScanned = false; // Flag para garantir apenas uma leitura
+  bool _isScanned = false;
 
   @override
   void dispose() {
@@ -31,7 +31,6 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
 
         _controller.stop();
 
-        // Retorna APENAS o código ISBN lido para a tela anterior (AddLivro)
         Navigator.pop(context, barcode.rawValue);
         break;
       }

@@ -9,7 +9,6 @@ class DatabaseHelper {
   static Database? _database;
   Future<Database> get database async => _database ??= await _initDatabase();
 
-  // 1. Mude a versão para 4
   static const int _version = 4; 
   static const String _dbName = 'livros_db.db';
 
@@ -52,7 +51,6 @@ class DatabaseHelper {
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Verifica se a tabela 'autores' precisa ser criada (para versões anteriores a 4)
     if (oldVersion < 4) {
       await db.execute('''
         CREATE TABLE IF NOT EXISTS autores (

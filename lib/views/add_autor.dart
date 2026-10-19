@@ -76,7 +76,6 @@ class _AddAutorState extends State<AddAutor> {
                       const SnackBar(content: Text("Autor salvo com sucesso!")),
                     );
                     
-                    // Retorna 'true' para indicar que a lista precisa ser recarregada
                     Navigator.pop(context, true);
                   }
                 },

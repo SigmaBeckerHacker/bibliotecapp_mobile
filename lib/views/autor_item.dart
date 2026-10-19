@@ -2,21 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:bibliotecapp_mobile/models/autor.dart';
 import 'package:bibliotecapp_mobile/views/add_autor.dart';
 
-class AutorItem extends StatefulWidget {
+class AutorItem extends StatelessWidget {
   final Autor autor;
-  final Function() deleteItem;
+  final VoidCallback deleteItem;
+  final VoidCallback onAutorUpdated;
 
   const AutorItem({
     super.key,
     required this.autor,
     required this.deleteItem,
+    required this.onAutorUpdated,
   });
 
-  @override
-  State<AutorItem> createState() => _AutorItemState();
-}
-
-class _AutorItemState extends State<AutorItem> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -28,7 +25,7 @@ class _AutorItemState extends State<AutorItem> {
         leading: CircleAvatar(
           backgroundColor: Theme.of(context).colorScheme.primary,
           child: Text(
-            widget.autor.nome.isNotEmpty ? widget.autor.nome[0].toUpperCase() : '?',
+            autor.nome.isNotEmpty ? autor.nome[0].toUpperCase() : '?',
             style: TextStyle(
               color: Theme.of(context).colorScheme.surface,
               fontWeight: FontWeight.bold,
@@ -36,7 +33,7 @@ class _AutorItemState extends State<AutorItem> {
           ),
         ),
         title: Text(
-          widget.autor.nome,
+          autor.nome,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -46,24 +43,24 @@ class _AutorItemState extends State<AutorItem> {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            GestureDetector(
-              onTap: () async {
-                final result = await Navigator.push(
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.white70, size: 22),
+              onPressed: () async {
+                final updated = await Navigator.push<bool>(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddAutor(autor: widget.autor),
+                    builder: (context) => AddAutor(autor: autor),
                   ),
                 );
-                if (result == true) {
-                  setState(() {});
+
+                if (updated == true) {
+                  onAutorUpdated();
                 }
               },
-              child: const Icon(Icons.edit, color: Colors.white70, size: 22),
             ),
-            const SizedBox(width: 16),
-            GestureDetector(
-              onTap: widget.deleteItem,
-              child: const Icon(Icons.delete, color: Colors.redAccent, size: 22),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.redAccent, size: 22),
+              onPressed: deleteItem,
             ),
           ],
         ),

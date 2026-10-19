@@ -61,7 +61,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           
-          // Row contendo "Seus livros:" e o botão "Autores" em Âmbar ao lado
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
             child: Row(

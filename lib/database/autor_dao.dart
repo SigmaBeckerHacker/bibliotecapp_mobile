@@ -26,8 +26,7 @@ class AutorDao {
   }
 
   Future<int> update(Autor autor) async {
-    Database db = await DatabaseHelper.instance.database;
-    return await db
-        .update('autores', autor.toMap(), where: 'id = ?', whereArgs: [autor.id]);
+    final db = await DatabaseHelper.instance.database;
+    return await db.update('autores', autor.toMap(), where: 'id = ?', whereArgs: [autor.id]);
   }
 }
