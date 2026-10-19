@@ -60,12 +60,12 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: const Text('Cadastro'),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -75,31 +75,56 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.person_add_rounded,
                   size: 80,
-                  color: Colors.blueAccent,
+                  color: colorScheme.primary,
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Crie sua conta',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Preencha os campos abaixo',
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: TextStyle(
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
                 const SizedBox(height: 32),
+
+                // Campo E-mail
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                     labelText: 'E-mail',
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    labelStyle: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.email_outlined,
+                      color: colorScheme.primary,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.onSurface.withOpacity(0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -115,23 +140,46 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                   },
                 ),
                 const SizedBox(height: 16),
+
+                // Campo Senha
                 TextFormField(
                   controller: _senhaController,
                   obscureText: _ocultarSenha,
+                  style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                     labelText: 'Senha',
-                    prefixIcon: const Icon(Icons.lock_outlined),
+                    labelStyle: TextStyle(
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.lock_outlined,
+                      color: colorScheme.primary,
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _ocultarSenha
                             ? Icons.visibility_off
                             : Icons.visibility,
+                        color: colorScheme.primary,
                       ),
                       onPressed: () {
                         setState(() {
                           _ocultarSenha = !_ocultarSenha;
                         });
                       },
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.onSurface.withOpacity(0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 2,
+                      ),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -148,12 +196,15 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                   },
                 ),
                 const SizedBox(height: 24),
+
+                // Botão Cadastrar
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -164,7 +215,6 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
                       ),
                     ),
                   ),
