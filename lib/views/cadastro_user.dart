@@ -16,6 +16,7 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
   bool _ocultarSenha = true;
 
   Future<void> _cadastrarUsuario() async {
+    final colorScheme = Theme.of(context).colorScheme;
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text.trim();
       String senhaHash = User.gerarHash(_senhaController.text);
@@ -32,9 +33,9 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
 
       if (existente.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+           SnackBar(
             content: Text('Este e-mail já está cadastrado!'),
-            backgroundColor: Colors.orange,
+            backgroundColor: colorScheme.primary,
           ),
         );
         return;
@@ -48,9 +49,9 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Usuário cadastrado com sucesso!'),
-          backgroundColor: Colors.green,
+          backgroundColor: colorScheme.secondary,
         ),
       );
 
@@ -201,7 +202,7 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
-                      foregroundColor: Colors.black,
+                      foregroundColor: colorScheme.surface,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

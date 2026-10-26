@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _ocultarSenha = true;
 
   Future<void> _fazerLogin() async {
+    final colorScheme = Theme.of(context).colorScheme;
     if (_formKey.currentState!.validate()) {
       String email = _emailController.text.trim();
       String senhaHash = User.gerarHash(_senhaController.text);
@@ -33,9 +34,9 @@ class _LoginPageState extends State<LoginPage> {
 
       if (result.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+           SnackBar(
             content: Text('Login realizado com sucesso!'),
-            backgroundColor: Colors.green,
+            backgroundColor: colorScheme.secondary,
           ),
         );
 
@@ -45,9 +46,9 @@ class _LoginPageState extends State<LoginPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('E-mail ou senha incorretos!'),
-            backgroundColor: Colors.red,
+            backgroundColor: colorScheme.error,
           ),
         );
       }
@@ -168,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
-                        foregroundColor: Colors.black,
+                        foregroundColor: colorScheme.surface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

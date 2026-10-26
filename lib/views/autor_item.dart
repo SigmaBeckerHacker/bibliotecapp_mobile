@@ -16,6 +16,7 @@ class AutorItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       color: Colors.grey.shade900,
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
@@ -34,17 +35,17 @@ class AutorItem extends StatelessWidget {
         ),
         title: Text(
           autor.nome,
-          style: const TextStyle(
+          style:  TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            color: Colors.white,
+            color: colorScheme.onSurface,
           ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.edit, color: Colors.white70, size: 22),
+              icon:  Icon(Icons.edit, color: colorScheme.onSurface, size: 22),
               onPressed: () async {
                 final updated = await Navigator.push<bool>(
                   context,
@@ -59,7 +60,7 @@ class AutorItem extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.delete, color: Colors.redAccent, size: 22),
+              icon:  Icon(Icons.delete, color: colorScheme.error, size: 22),
               onPressed: deleteItem,
             ),
           ],

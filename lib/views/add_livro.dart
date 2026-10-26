@@ -20,7 +20,6 @@ class _AddLivroState extends State<AddLivro> {
   final TextEditingController _generoController = TextEditingController();
 
   final Autor _autorNaoIdentificado = Autor(id: 0, nome: 'Autor não identificado');
-
   List<Autor> _listaAutores = [];
   Autor? _autorSelecionado;
 
@@ -115,6 +114,7 @@ class _AddLivroState extends State<AddLivro> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: widget.livro == null
@@ -249,7 +249,7 @@ class _AddLivroState extends State<AddLivro> {
  
                 if (_isCarregandoBook)
                   Container(
-                    color: Colors.black26,
+                    color: colorScheme.surface,
                     child: const Center(
                       child: CircularProgressIndicator(),
                     ),

@@ -17,6 +17,9 @@ class MyApp extends StatelessWidget {
           surface: Colors.black,
           primary: Colors.amber,
           onSurface: Colors.white,
+          secondary: Colors.green,
+          primaryContainer: Color.fromARGB(255, 32, 32, 32),
+          shadow: Colors.grey,
         ),
         scaffoldBackgroundColor: Colors.black,
         appBarTheme: const AppBarTheme(

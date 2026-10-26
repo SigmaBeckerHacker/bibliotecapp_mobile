@@ -19,7 +19,7 @@ class _LivroItemState extends State<LivroItem> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
-      color: Colors.grey.shade900,
+      color: colorScheme.primaryContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -38,7 +38,7 @@ class _LivroItemState extends State<LivroItem> {
                   },
                   child: Icon(
                     widget.livro.foi_lido ? Icons.book : Icons.book_outlined,
-                    color: widget.livro.foi_lido ? colorScheme.primary : Colors.grey,
+                    color: widget.livro.foi_lido ? colorScheme.primary : colorScheme.shadow,
                     size: 28,
                   ),
                 ),
@@ -54,12 +54,12 @@ class _LivroItemState extends State<LivroItem> {
                         );
                         setState(() {});
                       },
-                      child: const Icon(Icons.edit, color: Colors.white70, size: 20),
+                      child:  Icon(Icons.edit, color: colorScheme.onSurface, size: 20),
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
                       onTap: widget.deleteItem,
-                      child: const Icon(Icons.delete, color: Colors.redAccent, size: 20),
+                      child: Icon(Icons.delete, color: colorScheme.error, size: 20),
                     ),
                   ],
                 ),
@@ -70,14 +70,14 @@ class _LivroItemState extends State<LivroItem> {
 
             Text(
               widget.livro.titulo,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+              style:  TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: colorScheme.onSurface),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
             Text(
               widget.livro.autor,
-              style: const TextStyle(fontSize: 14, color: Colors.white70),
+              style:  TextStyle(fontSize: 14, color: colorScheme.onSurface),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

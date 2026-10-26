@@ -82,11 +82,11 @@ class _HomePageState extends State<HomePage> {
                     );
                     setState(() {});
                   },
-                  icon: const Icon(Icons.person, color: Colors.amber, size: 20),
-                  label: const Text(
+                  icon:  Icon(Icons.person, color: colorScheme.primary, size: 20),
+                  label:  Text(
                     "Autores",
                     style: TextStyle(
-                      color: Colors.amber,
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
