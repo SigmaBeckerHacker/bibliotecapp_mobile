@@ -98,7 +98,6 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // Campo E-mail
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -141,7 +140,6 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Campo Senha
                 TextFormField(
                   controller: _senhaController,
                   obscureText: _ocultarSenha,
@@ -197,7 +195,6 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // Botão Cadastrar
                 SizedBox(
                   width: double.infinity,
                   height: 50,

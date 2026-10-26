@@ -15,13 +15,11 @@ class LivroInfo {
 }
 
 class BookRepository {
-  /// Busca as informações do livro pelo ISBN.
   static Future<LivroInfo?> fetchByIsbn(String rawIsbn) async {
-    final cleanIsbn = rawIsbn.replaceAll(RegExp(r'[^0-9X]'), '');
+    final cleanIsbn = rawIsbn.toUpperCase().replaceAll(RegExp(r'[^0-9X]'), '');
 
     if (cleanIsbn.isEmpty) return null;
 
-    // 1. Tenta primeiro a Google Books API (Resposta muito mais rápida)
     try {
       final googleBooksResult = await _fetchFromGoogleBooks(cleanIsbn);
       if (googleBooksResult != null) {
@@ -31,7 +29,6 @@ class BookRepository {
       print('Erro no Google Books: $e');
     }
 
-    // 2. Fallback: Open Library API com timeout de 4 segundos para não travar
     try {
       final openLibraryResult = await _fetchFromOpenLibrary(cleanIsbn);
       if (openLibraryResult != null) {
@@ -49,8 +46,7 @@ class BookRepository {
       'https://www.googleapis.com/books/v1/volumes?q=isbn:$isbn',
     );
 
-    // Define timeout de 4 segundos
-    final response = await http.get(url).timeout(const Duration(seconds: 4));
+    final response = await http.get(url).timeout(const Duration(seconds: 5));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -83,7 +79,6 @@ class BookRepository {
       'https://openlibrary.org/api/books?bibkeys=ISBN:$isbn&jscmd=data&format=json',
     );
 
-    // Define timeout de 4 segundos
     final response = await http.get(url).timeout(const Duration(seconds: 4));
 
     if (response.statusCode == 200) {

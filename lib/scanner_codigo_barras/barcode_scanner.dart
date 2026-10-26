@@ -10,10 +10,14 @@ class BarcodeScannerScreen extends StatefulWidget {
 
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   final MobileScannerController _controller = MobileScannerController(
-    formats: [BarcodeFormat.ean13], // ISBNs utilizam o padrão EAN-13
+    formats: const [
+      BarcodeFormat.ean13,
+      BarcodeFormat.ean8,
+      BarcodeFormat.upcA,
+    ],
   );
 
-  bool _isScanned = false; // Garante que a leitura só seja disparada uma vez
+  bool _isScanned = false;
 
   @override
   void dispose() {
@@ -26,9 +30,9 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
 
     for (final barcode in capture.barcodes) {
       if (barcode.rawValue != null && barcode.rawValue!.isNotEmpty) {
-        // Limpa o código lido deixando apenas números/caracteres válidos do ISBN
-        final String isbnLimpo =
-            barcode.rawValue!.replaceAll(RegExp(r'[^0-9X]'), '');
+        final String isbnLimpo = barcode.rawValue!
+            .toUpperCase()
+            .replaceAll(RegExp(r'[^0-9X]'), '');
 
         if (isbnLimpo.isNotEmpty) {
           setState(() {
@@ -37,7 +41,6 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
 
           _controller.stop();
 
-          // Retorna apenas a String do ISBN limpo para a AddLivro
           Navigator.pop(context, isbnLimpo);
           break;
         }
