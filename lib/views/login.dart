@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bibliotecapp_mobile/models/user.dart';
-import 'package:bibliotecapp_mobile/database/database_helper.dart';
+import 'package:bibliotecapp_mobile/database/user_dao.dart';
 import 'cadastro_user.dart';
 import 'package:bibliotecapp_mobile/views/home_page.dart';
 
@@ -23,19 +23,14 @@ class _LoginPageState extends State<LoginPage> {
       String email = _emailController.text.trim();
       String senhaHash = User.gerarHash(_senhaController.text);
 
-      final db = await DatabaseHelper.instance.database;
-      final result = await db.query(
-        'usuarios',
-        where: 'email = ? AND senha = ?',
-        whereArgs: [email, senhaHash],
-      );
+      bool loginValido = await UserDao.instance.validarLogin(email, senhaHash);
 
       if (!mounted) return;
 
-      if (result.isNotEmpty) {
+      if (loginValido) {
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-            content: Text('Login realizado com sucesso!'),
+          SnackBar(
+            content: const Text('Login realizado com sucesso!'),
             backgroundColor: colorScheme.secondary,
           ),
         );
@@ -47,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('E-mail ou senha incorretos!'),
+            content: const Text('E-mail ou senha incorretos!'),
             backgroundColor: colorScheme.error,
           ),
         );
@@ -89,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                     'Acesse sua biblioteca de livros',
                     style: TextStyle(
                       fontSize: 14,
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: 32),
@@ -100,11 +95,11 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'E-mail',
-                      labelStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+                      labelStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.7)),
                       prefixIcon: Icon(Icons.email_outlined, color: colorScheme.primary),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: colorScheme.onSurface.withOpacity(0.3)),
+                        borderSide: BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.3)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -129,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'Senha',
-                      labelStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+                      labelStyle: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.7)),
                       prefixIcon: Icon(Icons.lock_outlined, color: colorScheme.primary),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -144,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: colorScheme.onSurface.withOpacity(0.3)),
+                        borderSide: BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.3)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),

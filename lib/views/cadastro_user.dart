@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bibliotecapp_mobile/models/user.dart';
-import 'package:bibliotecapp_mobile/database/database_helper.dart';
+import 'package:bibliotecapp_mobile/database/user_dao.dart';
 
 class CadastroUserPage extends StatefulWidget {
   const CadastroUserPage({super.key});
@@ -21,36 +21,27 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
       String email = _emailController.text.trim();
       String senhaHash = User.gerarHash(_senhaController.text);
 
-      final db = await DatabaseHelper.instance.database;
-
-      List<Map<String, dynamic>> existente = await db.query(
-        'usuarios',
-        where: 'email = ?',
-        whereArgs: [email],
-      );
+      bool jaExiste = await UserDao.instance.emailExiste(email);
 
       if (!mounted) return;
 
-      if (existente.isNotEmpty) {
+      if (jaExiste) {
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-            content: Text('Este e-mail já está cadastrado!'),
+          SnackBar(
+            content: const Text('Este e-mail já está cadastrado!'),
             backgroundColor: colorScheme.primary,
           ),
         );
         return;
       }
 
-      await db.insert('usuarios', {
-        'email': email,
-        'senha': senhaHash,
-      });
+      await UserDao.instance.cadastrarUsuario(email, senhaHash);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Usuário cadastrado com sucesso!'),
+          content: const Text('Usuário cadastrado com sucesso!'),
           backgroundColor: colorScheme.secondary,
         ),
       );
@@ -94,7 +85,7 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                 Text(
                   'Preencha os campos abaixo',
                   style: TextStyle(
-                    color: colorScheme.onSurface.withOpacity(0.7),
+                    color: colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -106,7 +97,7 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                   decoration: InputDecoration(
                     labelText: 'E-mail',
                     labelStyle: TextStyle(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     prefixIcon: Icon(
                       Icons.email_outlined,
@@ -115,7 +106,7 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: colorScheme.onSurface.withOpacity(0.3),
+                        color: colorScheme.onSurface.withValues(alpha: 0.3),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -148,7 +139,7 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                   decoration: InputDecoration(
                     labelText: 'Senha',
                     labelStyle: TextStyle(
-                      color: colorScheme.onSurface.withOpacity(0.7),
+                      color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                     prefixIcon: Icon(
                       Icons.lock_outlined,
@@ -170,7 +161,7 @@ class _CadastroUserPageState extends State<CadastroUserPage> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: colorScheme.onSurface.withOpacity(0.3),
+                        color: colorScheme.onSurface.withValues(alpha: 0.3),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
